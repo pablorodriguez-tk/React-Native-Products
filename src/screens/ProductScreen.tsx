@@ -22,21 +22,20 @@ interface Props
 export const ProductScreen = ({route, navigation}: Props) => {
   const {id = '', name = ''} = route.params;
 
-  const {_id, categoriaId, nombre, img, form, onChange, setFormValue} = useForm(
-    {
-      _id: id,
-      categoriaId: '',
-      nombre: name,
-      img: '',
-    },
-  );
+  const {_id, categoriaId, nombre, img, onChange, setFormValue} = useForm({
+    _id: id,
+    categoriaId: '',
+    nombre: name,
+    img: '',
+  });
 
-  const {categories, isLoading} = useCategories();
-  const {loadProductbyId} = useContext(ProductsContext);
+  const {categories} = useCategories();
+  const {loadProductbyId, addProduct, updateProduct} =
+    useContext(ProductsContext);
 
   useEffect(() => {
-    navigation.setOptions({title: name ? name : 'Nuevo Producto'});
-  }, []);
+    navigation.setOptions({title: nombre ? nombre : 'Sin nombre del Producto'});
+  }, [nombre]);
 
   useEffect(() => {
     loadProduct();
@@ -51,6 +50,16 @@ export const ProductScreen = ({route, navigation}: Props) => {
       img: product.img || '',
       nombre,
     });
+  };
+
+  const saveOrUpdate = async () => {
+    if (id.length > 0) {
+      updateProduct(categoriaId, nombre, id);
+    } else {
+      const tempCategoriaId = categoriaId || categories[0]._id;
+      const newProduct = await addProduct(tempCategoriaId, nombre);
+      onChange(newProduct._id, '_id');
+    }
   };
 
   return (
@@ -72,17 +81,21 @@ export const ProductScreen = ({route, navigation}: Props) => {
             <Picker.Item label={c.nombre} value={c._id} key={c._id} />
           ))}
         </Picker>
-        <Button title="Guardar" onPress={() => {}} color="#5856D6" />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginTop: 10,
-          }}>
-          <Button title="Camara" onPress={() => {}} color="#5856D6" />
-          <View style={{width: 10}} />
-          <Button title="Galeria" onPress={() => {}} color="#5856D6" />
-        </View>
+        <Button title="Guardar" onPress={saveOrUpdate} color="#5856D6" />
+
+        {_id.length > 0 && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginTop: 10,
+            }}>
+            <Button title="Camara" onPress={() => {}} color="#5856D6" />
+            <View style={{width: 10}} />
+            <Button title="Galeria" onPress={() => {}} color="#5856D6" />
+          </View>
+        )}
+
         {img.length > 0 && (
           <Image
             source={{uri: img}}
