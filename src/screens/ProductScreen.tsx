@@ -1,5 +1,5 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
   Button,
+  Image,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ProductsStackParams} from '../navigator/ProductsNavigator';
@@ -20,7 +21,7 @@ interface Props
 
 export const ProductScreen = ({route, navigation}: Props) => {
   const {id = '', name = ''} = route.params;
-  const [selectedLanguage, setSelectedLanguage] = useState();
+
   const {_id, categoriaId, nombre, img, form, onChange, setFormValue} = useForm(
     {
       _id: id,
@@ -44,7 +45,6 @@ export const ProductScreen = ({route, navigation}: Props) => {
   const loadProduct = async () => {
     if (id.length === 0) return;
     const product = await loadProductbyId(id);
-    console.log(product.categoria.nombre);
     setFormValue({
       _id: id,
       categoriaId: product.categoria._id,
@@ -63,20 +63,15 @@ export const ProductScreen = ({route, navigation}: Props) => {
           onChangeText={value => onChange(value, 'nombre')}
           style={styles.textInput}
         />
-
         {/* Selector  */}
         <Text style={styles.label}>Seleccione la categoria:</Text>
-
         <Picker
-          selectedValue={selectedLanguage}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedLanguage(itemValue)
-          }>
+          selectedValue={categoriaId}
+          onValueChange={value => onChange(value, 'categoriaId')}>
           {categories.map(c => (
             <Picker.Item label={c.nombre} value={c._id} key={c._id} />
           ))}
         </Picker>
-
         <Button title="Guardar" onPress={() => {}} color="#5856D6" />
         <View
           style={{
@@ -88,8 +83,13 @@ export const ProductScreen = ({route, navigation}: Props) => {
           <View style={{width: 10}} />
           <Button title="Galeria" onPress={() => {}} color="#5856D6" />
         </View>
-
-        <Text>{JSON.stringify(form, null, 5)}</Text>
+        {img.length > 0 && (
+          <Image
+            source={{uri: img}}
+            style={{width: '100%', height: 300, marginTop: 20}}
+          />
+        )}
+        {/* TODO: Mostrar imagen temporal */}
       </ScrollView>
     </View>
   );
