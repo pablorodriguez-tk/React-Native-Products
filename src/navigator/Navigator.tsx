@@ -5,6 +5,7 @@ import {RegisterScreen} from '../screens/RegisterScreen';
 import {ProtectedScreen} from '../screens/ProtectedScreen';
 import {AuthContext} from '../context/authContext';
 import {LoadingScreen} from '../screens/LoadingScreen';
+import {ProductsNavigator} from './ProductsNavigator';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +21,13 @@ export const Navigator = () => {
         cardStyle: {backgroundColor: 'white'},
       }}>
       {status === 'authenticated' ? (
-        <Stack.Screen name="ProtectedScreen" component={ProtectedScreen} />
+        <>
+          <Stack.Screen
+            name="ProductsNavigator"
+            component={ProductsNavigator}
+          />
+          <Stack.Screen name="ProtectedScreen" component={ProtectedScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
