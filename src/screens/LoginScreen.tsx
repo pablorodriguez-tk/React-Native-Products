@@ -1,5 +1,6 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import React from 'react';
+import {useContext} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,6 +12,7 @@ import {
 } from 'react-native';
 import {Background} from '../components/Background';
 import {WhiteLogo} from '../components/WhiteLogo';
+import {AuthContext} from '../context/authContext';
 import {useForm} from '../hooks/useForm';
 import {loginStyles} from '../theme/loginTheme';
 
@@ -18,9 +20,11 @@ interface Props extends StackScreenProps<any, any> {}
 
 export const LoginScreen = ({navigation}: Props) => {
   const {email, password, onChange} = useForm({email: '', password: ''});
+  const {signIn} = useContext(AuthContext);
 
   const onLogin = () => {
     console.log({email, password});
+    signIn({correo: email, password});
     Keyboard.dismiss();
   };
 
