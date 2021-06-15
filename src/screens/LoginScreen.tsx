@@ -23,7 +23,6 @@ export const LoginScreen = ({navigation}: Props) => {
   const {signIn, errorMessage, removeError} = useContext(AuthContext);
 
   const onLogin = () => {
-    console.log({email, password});
     signIn({correo: email, password});
     Keyboard.dismiss();
   };
