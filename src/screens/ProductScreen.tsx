@@ -15,13 +15,15 @@ import {useCategories} from '../hooks/useCategories';
 import {useForm} from '../hooks/useForm';
 import {useContext} from 'react';
 import {ProductsContext} from '../context/ProductsContext';
+import {launchCamera} from 'react-native-image-picker';
+import {useState} from 'react';
 
 interface Props
   extends StackScreenProps<ProductsStackParams, 'ProductScreen'> {}
 
 export const ProductScreen = ({route, navigation}: Props) => {
   const {id = '', name = ''} = route.params;
-
+  const [tempUri, setTempUri] = useState<string>();
   const {_id, categoriaId, nombre, img, onChange, setFormValue} = useForm({
     _id: id,
     categoriaId: '',
@@ -30,7 +32,7 @@ export const ProductScreen = ({route, navigation}: Props) => {
   });
 
   const {categories} = useCategories();
-  const {loadProductbyId, addProduct, updateProduct} =
+  const {loadProductbyId, addProduct, updateProduct, uploadImage} =
     useContext(ProductsContext);
 
   useEffect(() => {
@@ -62,6 +64,15 @@ export const ProductScreen = ({route, navigation}: Props) => {
     }
   };
 
+  const takePhoto = () => {
+    launchCamera({mediaType: 'photo', quality: 0.5}, resp => {
+      if (resp.didCancel) return;
+      if (!resp.assets[0].uri) return;
+      setTempUri(resp.assets[0].uri);
+      uploadImage(resp, _id);
+    });
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -82,7 +93,6 @@ export const ProductScreen = ({route, navigation}: Props) => {
           ))}
         </Picker>
         <Button title="Guardar" onPress={saveOrUpdate} color="#5856D6" />
-
         {_id.length > 0 && (
           <View
             style={{
@@ -90,19 +100,24 @@ export const ProductScreen = ({route, navigation}: Props) => {
               justifyContent: 'center',
               marginTop: 10,
             }}>
-            <Button title="Camara" onPress={() => {}} color="#5856D6" />
+            <Button title="Camara" onPress={takePhoto} color="#5856D6" />
             <View style={{width: 10}} />
             <Button title="Galeria" onPress={() => {}} color="#5856D6" />
           </View>
         )}
-
-        {img.length > 0 && (
+        {img.length > 0 && !tempUri && (
           <Image
             source={{uri: img}}
             style={{width: '100%', height: 300, marginTop: 20}}
           />
         )}
         {/* TODO: Mostrar imagen temporal */}
+        {tempUri && (
+          <Image
+            source={{uri: tempUri}}
+            style={{width: '100%', height: 300, marginTop: 20}}
+          />
+        )}
       </ScrollView>
     </View>
   );
