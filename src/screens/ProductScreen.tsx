@@ -15,7 +15,7 @@ import {useCategories} from '../hooks/useCategories';
 import {useForm} from '../hooks/useForm';
 import {useContext} from 'react';
 import {ProductsContext} from '../context/ProductsContext';
-import {launchCamera} from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useState} from 'react';
 
 interface Props
@@ -73,6 +73,15 @@ export const ProductScreen = ({route, navigation}: Props) => {
     });
   };
 
+  const takePhotoFromGallery = () => {
+    launchImageLibrary({mediaType: 'photo', quality: 0.5}, resp => {
+      if (resp.didCancel) return;
+      if (!resp.assets[0].uri) return;
+      setTempUri(resp.assets[0].uri);
+      uploadImage(resp, _id);
+    });
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -102,7 +111,11 @@ export const ProductScreen = ({route, navigation}: Props) => {
             }}>
             <Button title="Camara" onPress={takePhoto} color="#5856D6" />
             <View style={{width: 10}} />
-            <Button title="Galeria" onPress={() => {}} color="#5856D6" />
+            <Button
+              title="Galeria"
+              onPress={takePhotoFromGallery}
+              color="#5856D6"
+            />
           </View>
         )}
         {img.length > 0 && !tempUri && (
